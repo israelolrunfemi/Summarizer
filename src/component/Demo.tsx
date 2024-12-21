@@ -1,41 +1,42 @@
-import React, { useState } from 'react';
-import { useSummary } from '../hook/useSummary'; // Import your custom hook
+// App.js
+import  { useState } from 'react';
+import useArticleSummary from '../hook/useArticleSummary';
 
-const Demo: React.FC = () => {
-  const [url, setUrl] = useState<string>(''); // URL entered by the user
-  const [fetchUrl, setFetchUrl] = useState<string>(''); // URL to trigger the API call
-  
-  const { summary, loading, error } = useSummary(fetchUrl); // The hook uses fetchUrl to trigger
+const Demo = () => {
+  const [inputUrl, setInputUrl] = useState('');
+  const [url, setUrl] = useState('');
+  const { summary, error, loading } = useArticleSummary(url);
 
-  const handleUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUrl(event.target.value); // Update the URL input
-  };
-
-  const handleSummarizeClick = () => {
-    setFetchUrl(url); // Set the fetchUrl to trigger the API call in useEffect
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (inputUrl.trim()) {
+      setUrl(inputUrl.trim()); // Set the URL for the custom hook
+    }
   };
 
   return (
-    <div>
-      <h1>URL Summarizer</h1>
-      <input
-        type="text"
-        placeholder="Enter URL"
-        value={url}
-        onChange={handleUrlChange} // Change URL value
-        style={{ width: '300px', padding: '5px' }}
-      />
-      <button onClick={handleSummarizeClick} style={{ marginLeft: '10px' }}>
-        {loading ? 'Summarizing...' : 'Summarize'}
-      </button>
-
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-
-      {summary && (
-        <div style={{ marginTop: '20px' }}>
-          <h2>Summary:</h2>
+    <div style={{ padding: '20px' }}>
+      <h1>Article Summarizer</h1>
+      <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
+        <input
+          type="text"
+          value={inputUrl}
+          onChange={(e) => setInputUrl(e.target.value)}
+          placeholder="Enter article URL"
+          style={{ width: '300px', padding: '10px', marginRight: '10px' }}
+        />
+        <button type="submit" style={{ padding: '10px' }}>
+          Summarize
+        </button>
+      </form>
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+      {summary ? (
+        <div>
           <p>{summary}</p>
         </div>
+      ) : (
+        !loading && url && <p>No summary available for the given URL.</p>
       )}
     </div>
   );
